@@ -1,0 +1,59 @@
+server:
+  port: 8100
+  servlet:
+    context-path: /mall-cloud-upload-service
+
+spring:
+  application:
+    name: mall-cloud-upload-service
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+        namespace: 90f44db4-bf87-4630-8864-c3b1cb98e2fd
+        metadata:
+          management:
+            context-path: ${server.servlet.context-path}/actuator
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    producer:
+      retries: 3
+    consumer:
+      auto-offset-reset: latest
+  zipkin:
+    sender:
+      type: kafka # 默认是 web
+    base-url: http://127.0.0.1:9411/
+  jackson:
+    time-zone: Asia/Shanghai
+
+seata:
+  enabled: false
+
+mall:
+  upload:
+    schema: http
+    host: 127.0.0.1
+    port: 9000
+    dir: E:/Documents/mall-cloud/upload/
+    image:
+      context: images
+    file:
+      context: files
+  order:
+    pay:
+      host: 127.0.0.1:9000
+
+logging:
+  pattern:
+    console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

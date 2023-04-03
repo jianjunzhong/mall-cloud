@@ -1,0 +1,31 @@
+server:
+  port: 7000
+  servlet:
+    context-path: /mall-cloud-admin
+
+spring:
+  application:
+    name: mall-cloud-admin
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+        namespace: 90f44db4-bf87-4630-8864-c3b1cb98e2fd
+        metadata:
+          management:
+            context-path: ${server.servlet.context-path}/actuator
+  thymeleaf:
+    check-template: false
+    check-template-location: false
+  jackson:
+    time-zone: Asia/Shanghai
+# 向 Spring Boot Admin 暴露端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'  # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 *, 可以开放所有端点
+  endpoint:
+    health:
+      show-details: always

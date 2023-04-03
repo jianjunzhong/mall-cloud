@@ -1,0 +1,105 @@
+server:
+  port: 8010
+  servlet:
+    context-path: /mall-cloud-category-product-service
+
+spring:
+  application:
+    name: mall-cloud-category-product-service
+  datasource:
+    name: mall_datasource
+    url: jdbc:mysql://127.0.0.1:3306/mall_cloud?useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 12345678
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+        namespace: 90f44db4-bf87-4630-8864-c3b1cb98e2fd
+        metadata:
+          management:
+            context-path: ${server.servlet.context-path}/actuator
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:7777
+        port: 8011
+    stream:
+      kafka:
+        binder:
+          brokers: 127.0.0.1:9092
+          auto-create-topics: true
+      instanceCount: 1  # 消费者的总数
+      instanceIndex: 0  # 当前消费者的索引
+      bindings:
+        restoreStockInput:
+          destination: mall-cloud-stream-restoreStock
+          group: mall-cloud-restoreStockInput
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 8888
+    timeout: 10000
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    producer:
+      retries: 3
+    consumer:
+      auto-offset-reset: latest
+  zipkin:
+    sender:
+      type: kafka # 默认是 web
+    base-url: http://127.0.0.1:9411/
+  jackson:
+    time-zone: Asia/Shanghai
+
+seata:
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
+      namespace: 90f44db4-bf87-4630-8864-c3b1cb98e2fd
+      username: nacos
+      password: nacos
+  config:
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      group : SEATA_GROUP
+      namespace: 90f44db4-bf87-4630-8864-c3b1cb98e2fd
+      dataId: seataServer.properties
+      username: nacos
+      password: nacos
+  tx-service-group: mall-cloud # 全局事务分组，对应的配置为 service.vgroupMapping.mall-cloud=default
+
+
+mybatis:
+  mapper-locations: classpath:/mappers/*.xml
+
+feign:
+  # 开启 gzip 压缩
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 1024 # 单位为 KB
+    response:
+      enabled: true
+  sentinel:
+    enabled: true
+
+logging:
+  pattern:
+    console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

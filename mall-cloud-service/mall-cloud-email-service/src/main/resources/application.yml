@@ -1,0 +1,75 @@
+server:
+  port: 8200
+  servlet:
+    context-path: /mall-cloud-email-service
+
+spring:
+  application:
+    name: mall-cloud-email-service
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: username
+    password: password
+    default-encoding: utf-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 8888
+    timeout: 5000
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+        namespace: 90f44db4-bf87-4630-8864-c3b1cb98e2fd
+        metadata:
+          management:
+            context-path: ${server.servlet.context-path}/actuator
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:7777
+        port: 8201
+    stream:
+      kafka:
+        binder:
+          brokers: 127.0.0.1:9092
+          auto-create-topics: true
+      instanceCount: 1  # 消费者的总数
+      instanceIndex: 0  # 当前消费者的索引
+      bindings:
+        verificationCodeInput:
+          destination: mall-cloud-stream-verificationCode
+          group: mall-cloud-verificationCodeInput
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    producer:
+      retries: 3
+    consumer:
+      auto-offset-reset: latest
+  zipkin:
+    sender:
+      type: kafka # 默认是 web
+    base-url: http://127.0.0.1:9411/
+  jackson:
+    time-zone: Asia/Shanghai
+
+seata:
+  enabled: false
+
+logging:
+  pattern:
+    console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

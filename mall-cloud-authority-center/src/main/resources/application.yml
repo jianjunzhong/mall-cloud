@@ -1,0 +1,68 @@
+server:
+  port: 8000
+  servlet:
+    context-path: /mall-cloud-authority-center
+
+spring:
+  application:
+    name: mall-cloud-authority-center
+  datasource:
+    name: mall_datasource
+    url: jdbc:mysql://127.0.0.1:3306/mall_cloud?useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 12345678
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: 127.0.0.1:8848
+        namespace: 90f44db4-bf87-4630-8864-c3b1cb98e2fd
+        metadata:
+          management:
+            context-path: ${server.servlet.context-path}/actuator
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:7777
+        port: 8001
+    stream:
+      kafka:
+        binder:
+          brokers: 127.0.0.1:9092
+          auto-create-topics: true
+      bindings:
+        verificationCodeOutput:
+          destination: mall-cloud-stream-verificationCode    # 消息发往的目的地，相当于 kafka 的 topic
+          content-type: text/plain    # 消息发送的格式， 接收端不用指定格式， 但是发送端要
+  zipkin:
+    sender:
+      type: kafka # 默认是 web
+    base-url: http://127.0.0.1:9411/
+  # spring-kafka 的配置
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    producer:
+      retries: 3
+    consumer:
+      auto-offset-reset: latest
+  jackson:
+    time-zone: Asia/Shanghai
+
+seata:
+  enabled: false
+
+mybatis:
+  mapper-locations: classpath:/mappers/*.xml
+
+logging:
+  pattern:
+    console: "%clr(%d{${LOG_DATEFORMAT_PATTERN:HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
